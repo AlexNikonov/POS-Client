@@ -29,9 +29,9 @@
               @click:prepend="decrementQuantity(row)">
             </v-text-field>
           </v-flex>
-          <v-flex lg1 pl-1 py-1>{{ row.price.toFixed(2) }}</v-flex>
-          <v-flex lg1 pl-1 py-1>{{ row.discount.toFixed(2) }}</v-flex>
-          <v-flex lg1 pl-1 py-1>{{ row.price_discount.toFixed(2) }}</v-flex>
+          <v-flex lg1 pl-1 py-1>{{ row.price_base | price_format }}</v-flex>
+          <v-flex lg1 pl-1 py-1>{{ row.discount | price_format }}</v-flex>
+          <v-flex lg1 pl-1 py-1>{{ row.price_discount | price_format }}</v-flex>
           <v-flex lg1 py-1>
             <v-btn icon class="hidden-xs-only" @click="add(row)">
               <v-icon large>add_circle_outline</v-icon>
@@ -51,7 +51,7 @@
 
 <script>
 
-import axios from 'axios'
+import api from '@/api/index'
 import { mapActions } from 'vuex'
 
 export default {
@@ -78,10 +78,9 @@ export default {
     async fetchData () {
       var url = ''
       if (this.id) {
-        url = `http://localhost:3000/v1/orders/${ this.id }`
         try {
           this.errors = []
-          const response = await axios.get(url)
+          const response = await api.get(`orders/${ this.id }`)
           this.order = response.data.item
         } catch (e) {
           this.errors.push(e)

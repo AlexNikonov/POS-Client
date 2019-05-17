@@ -1,6 +1,7 @@
 <template>
   <v-content>
     <v-layout column v-if="items" justify-start>
+      <loading-indicator />
       <v-flex xs12 py-2 v-for="item in items" :key=item.id>
         <a :href="item.link">{{ item.brand}} - {{ item.number}} - {{ item.name }}</a>
       </v-flex>
@@ -14,7 +15,8 @@
 </template>
 
 <script>
-import axios from 'axios'
+import api from '@/api/index'
+import LoadingIndicator from '@/components/LoadingIndicator.vue'
 
 export default {
   name: 'search-result',
@@ -34,7 +36,7 @@ export default {
     async fetchData() {
       try {
         this.errors = []
-        const response = await axios.get(`http://localhost:3000/v1/products/search/${ this.substring }`)
+        const response = await api.get(`products/search/${ this.substring }`)
         this.response = response
         this.items = response.data.list
       } catch (e) {
@@ -44,6 +46,9 @@ export default {
   },
   mounted () {
     this.fetchData()
+  },
+  components: {
+    LoadingIndicator
   }
 }
 </script>

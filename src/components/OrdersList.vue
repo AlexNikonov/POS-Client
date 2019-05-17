@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import api from '@/api/index'
 import OrderItem from './OrderItem.vue'
 
 export default {
@@ -27,7 +27,7 @@ export default {
   components: {
     OrderItem
   },
-  mounted () {
+  created () {
     this.fetchData()
   },
   beforeRouteUpdate (to, from, next) {
@@ -38,19 +38,20 @@ export default {
     async fetchData () {
       var url = ''
       if (this.substring) {
-        url = `http://localhost:3000/v1/orders/substring/${ this.substring }`
+        url = `orders/substring/${ this.substring }`
       } else if (this.phone_number) {
-        url = `http://localhost:3000/v1/orders/phone_number/${ this.phone_number }` 
+        url = `orders/phone_number/${ this.phone_number }` 
       } else if (this.date_range) {
-        url = `http://localhost:3000/v1/orders/date_range/${ this.date_range }`
+        url = `orders/date_range/${ this.date_range }`
       } else {
-        url = `http://localhost:3000/v1/orders/date_range/last_week`
+        url = `orders/date_range/last_week`
       }
       if (url) {
         try {
           this.errors = []
-          const response = await axios.get(url)
+          const response = await api.get(url)
           this.response = response
+          console.log(response.data.list)
           this.items = response.data.list
         } catch (e) {
           this.errors.push(e)

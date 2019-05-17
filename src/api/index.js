@@ -1,6 +1,33 @@
 import axios from 'axios'
+import store from '@/store/index'
 
-export default axios.create({
-  baseURL: 'http://localhost:3000/v1',
-  timeout: 5000
+const instance = axios.create({
+  baseURL: 'http://192.168.1.6:3000/v1',
+  timeout: 0.1 * 60 * 1000
 })
+
+instance.interceptors.request.use(
+  config => {
+    store.commit('common/SET_LOADING_STATE', true)
+    return config
+  },
+  error => {
+    if (error.config) {
+      store.commit('common/SET_LOADING_STATE', false)
+    }
+  }
+)
+
+instance.interceptors.response.use(
+  response => {
+    store.commit('common/SET_LOADING_STATE', false)
+    return response
+  },
+  error => {
+    if (error.response) {
+      store.commit('common/SET_LOADING_STATE', false)
+    }
+  }
+)
+
+export default instance

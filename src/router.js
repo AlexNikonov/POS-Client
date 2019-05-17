@@ -3,7 +3,7 @@ import Router from 'vue-router'
 
 import Cart from '@/components/Cart.vue'
 import Home from '@/components/Home.vue'
-import ReceiptsList from '@/components/ReceiptsList.vue'
+import Receipts from '@/components/Receipts.vue'
 import Search from '@/components/Search.vue'
 import SearchResult from '@/components/SearchResult.vue'
 import SearchItemsList from '@/components/SearchItemsList.vue'
@@ -30,8 +30,8 @@ const router = new Router({
     },
     {  
       path: '/receipts/:date_range?',
-      name: 'receipts-list',
-      component: ReceiptsList,
+      name: 'receipts',
+      component: Receipts,
       props: true
     },
     {  

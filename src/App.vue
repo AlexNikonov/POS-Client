@@ -15,14 +15,14 @@
         <v-btn flat :to="{ name: 'home' }" exact>{{ $t('home') }}</v-btn>
         <v-btn flat :to="{ name: 'search' }">{{ $t('search') }}</v-btn>
         <v-btn flat :to="{ name: 'cart' }">{{ $t('cart') }}</v-btn>
-        <v-btn flat :to="{ name: 'receipts-list' }">{{ $t('receipts_list') }}</v-btn>
+        <v-btn flat :to="{ name: 'receipts' }">{{ $t('receipts_list') }}</v-btn>
         <v-btn flat :to="{ name: 'orders' }">{{ $t('orders') }}</v-btn>
         <v-btn flat :to="{ name: 'service' }">{{ $t('service') }}</v-btn>
       </v-toolbar-items>
     </v-toolbar>
     <v-content>
       <v-container>
-        <router-view />
+        <router-view/>
       </v-container>
     </v-content>
   </v-app>

@@ -1,17 +1,14 @@
 'use strict'
 
 import { addReceipt } from '@/api/receipt'
-
-var get_uid = () => `f${(~~(Math.random()*1e8)).toString(16)}` 
-
-var round_price = price => Number(parseFloat(Math.round(price * 10) / 10).toFixed(2))
+import { get_uid, round_number, get_discount, get_price_discount } from '@/helpers'
 
 const state = {
   header: {
     cdate: '',
     user_id: 1,
     shop_id: 1,
-    price_type: 1
+    price_type_id: 1
 
   },
   items: []
@@ -28,33 +25,23 @@ const mutations = {
     const index = state.items.findIndex(a => a.id === item.id);
     if (index > -1) state.items[index] = item
   },
-  INCREMENT_QUANTITY (state, item) {
-    const index = state.items.findIndex(a => a.id === item.id);
-    if (index > -1) state.items[index].quantity++
-  },
-  DECREMENT_QUANTITY (state, item) {
-    const index = state.items.findIndex(a => a.id === item.id);
-    if (index > -1 && state.items[index].quantity > 2) state.items[index].quantity--
-  },
   UPDATE_QUANTITY (state, { item, value }) {
     const index = state.items.findIndex(a => a.id === item.id);
     if (index > -1) state.items[index].quantity = value
   },
-  INCREMENT_PRICE (state, { item, value }) {
+  UPDATE_DISCOUNT (state, { item, value }) {
     const index = state.items.findIndex(a => a.id === item.id);
-    if (index > -1) {
-      state.items[index].price = round_price(state.items[index].price + value)
-    }
-  },
-  DECREMENT_PRICE (state, { item, value }) {
-    const index = state.items.findIndex(a => a.id === item.id);
-    if (index > -1 && state.items[index].price > value) {
-      state.items[index].price = round_price(state.items[index].price - value)
+    if (index > -1) {    
+      state.items[index].price_discount = get_price_discount(state.items[index].price_base, value)
+      state.items[index].discount = round_number(value)
     }
   },
   UPDATE_PRICE (state, { item, value }) {
     const index = state.items.findIndex(a => a.id === item.id);
-    if (index > -1) state.items[index].price = round_price(value)
+    if (index > -1) {
+      state.items[index].discount = get_discount(state.items[index].price_base, value)
+      state.items[index].price_discount = round_number(value)
+    }
   },
   CLEAR_RECEIPT (state) {
     state.items = []
@@ -70,9 +57,9 @@ const actions = {
       number: item.number || '',
       name: item.name || '',
       quantity: item.quantity || 1,
-      price: round_price(item.price) || 0,
-      discount: round_price(discount) || 0,
-      price_discount: round_price(item.price_discount) || 0,
+      price_base: round_number(item.price_base) || 0,
+      discount: round_number(item.discount) || 0,
+      price_discount: round_number(item.price_discount) || 0,
       product_id: item.product_id || 0
     }
     commit('ADD_ITEM', item_to_add)
@@ -83,23 +70,14 @@ const actions = {
   updateItem ({ commit }, item) {
     commit('UPDATE_ITEM', item)
   },
-  incrementQuantity ({ commit }, item) {
-    commit('INCREMENT_QUANTITY', item)
+  updateQuantity ({ commit }, quantity) {
+    commit('UPDATE_QUANTITY', quantity)
   },
-  decrementQuantity ({ commit }, item) {
-    commit('DECREMENT_QUANTITY', item)
+  updateDiscount ({ commit }, discount) {
+    commit('UPDATE_DISCOUNT', discount)
   },
-  updateQuantity ({ commit }, payload) {
-    commit('UPDATE_QUANTITY', payload)
-  },
-  incrementPrice ({ commit }, payload) {
-    commit('INCREMENT_PRICE', payload)
-  },
-  decrementPrice ({ commit }, payload) {
-    commit('DECREMENT_PRICE', payload)
-  },
-  updatePrice ({ commit }, payload) {
-    commit('UPDATE_PRICE', payload)
+  updatePrice ({ commit }, price) {
+    commit('UPDATE_PRICE', price)
   },
   clearCart ({ commit }) {
     commit('CLEAR_RECEIPT')
@@ -117,8 +95,8 @@ const actions = {
 const getters = {
   items: state => state.items,
   total: state => {
-    return state.items ? round_price(state.items.reduce((total, item) => {
-      return total + item.price * item.quantity}, 0)).toFixed(2) : 0
+    return state.items ? round_number(state.items.reduce((total, item) => {
+      return total + item.price_discount * item.quantity}, 0)).toFixed(2) : 0
   }
 }
 

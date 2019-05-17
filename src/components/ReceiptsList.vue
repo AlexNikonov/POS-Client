@@ -1,76 +1,76 @@
-<template>
-<v-layout column>
-    <v-flex xs12>
-      <v-layout row>
-        <v-flex xs4 ml-3>
-          <v-select
-            outline
-            :label="$t('date_range.label')"
-            :items="$t('date_range.items')"
-            v-model="current_date_range"
-            @change="update($event)"
-          ></v-select>
-        </v-flex>
-      </v-layout>
-    </v-flex>
-    <v-flex xs12>
-      <v-layout column>
-        <v-flex>
-          <p v-if="!$options.items">Нет чеков за указанный период.</p>
-          <receipt-item v-for="item in $options.items" :key="item.id" :item=item></receipt-item>
-        </v-flex>
-      </v-layout>
-    </v-flex>
-  </v-layout>
-</template>
-
 <script>
-import { getListByDateRange } from '@/api/receipt'
 import ReceiptItem from '@/components/ReceiptItem.vue'
+import { getListByDateRange } from '@/api/receipt'
 
 export default {
   name: 'receipts-list',
-  items: [],
+  data () {
+    return {
+      items: []
+    }
+  },
   props: {
     date_range: {
+      type: String,
       default: 'today'
     }
   },
-  data () {
-    return {
-      current_date_range: '' 
-    }
-  },
-  methods: {
-    async fetchData () {
-      try {
-        this.$options.items = await getListByDateRange(this.current_date_range)
-      } catch (err) {
-        
-      }
-    },
-    update (date_range) {
-      this.$router.push({
-        name: 'receipts-list',
-        params: { date_range }
-      })
-    }
-  },
-  mounted () {
-    this.current_date_range = this.date_range
-    this.fetchData()
-  },
-  beforeRouteUpdate (to, from, next) {
-    this.current_date_range = to.params.date_range
-    this.fetchData()
-    next()
-  },
   components: {
     ReceiptItem
+  },
+  watch: {
+    date_range: {
+      immediate: true,
+      async handler( new_date_range ) {
+        this.items = await getListByDateRange(new_date_range) 
+      }
+    }
+  },
+  render (h) {
+    if (this.items.length) {
+      console.log(this.items)
+      let r_list = []
+      let days_list = this.items.reduce( (accumulator, currentValue) => {
+        let current_date = this.$d(new Date(currentValue.created), 'short')
+        accumulator[current_date] = accumulator[current_date] || []
+        accumulator[current_date].push(currentValue)
+        return accumulator 
+      }, Object.create(null))
+      for (const item_date in days_list) {
+        let day_amount = days_list[item_date].reduce( (total, receipt) => {
+          return total += receipt.total
+        }, 0)
+        let day_list = days_list[item_date].map( (receipt) => {
+          return h(ReceiptItem, {
+            props: {
+              item: receipt
+            } 
+          })
+        })
+        r_list.push(
+          h('div',
+            {
+              attrs: {
+                class: 'receipt'
+              }
+            },
+            [
+              h('h2', item_date + ' / ' + day_amount + ' руб.'),
+              ...day_list    
+            ]
+          )
+        )
+      }
+      return h('div', {}, r_list )
+    } else {
+      return h('p', 'Нет чеков за указанный период.')
+    }
   }
 }
 </script>
 
 <style scoped>
-
+  .receipt {
+    padding: 1em;  
+  }
 </style>

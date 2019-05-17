@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import api from '@/api/index'
 
 export default {
   name: 'search-items-list',
@@ -51,18 +51,23 @@ export default {
     }
   },
   methods: {
-    add_to_cart (item, price) {
+    add_to_cart (item, selected_price) {
       this.snackbar_item = item
       this.snackbar = true
-      const item_to_add = { ...item, price: price, quantity: 1}
+      const item_to_add = {
+        ...item,
+        price_base: selected_price,
+        price_discount: selected_price,
+        quantity: 1
+      }
       this.$store.dispatch('cart/addItem', item_to_add)
     }
   },
   async mounted () {
     try {
       this.errors = []
-      const response = await axios.get(
-        `http://localhost:3000/v1/products/search/exact/brand_id/${ this.brand_id }/string/${ this.string }`
+      const response = await api.get(
+        `products/search/exact/brand_id/${ this.brand_id }/string/${ this.string }`
       )
       this.response = response
       this.items = response.data.list

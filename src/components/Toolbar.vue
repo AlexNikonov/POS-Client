@@ -7,7 +7,7 @@
     <v-btn flat :to="{ name: 'home' }" exact>{{ $t('home') }}</v-btn>
     <v-btn flat :to="{ name: 'search' }" exact>{{ $t('search') }}</v-btn>
     <v-btn flat :to="{ name: 'cart' }" exact>{{ $t('cart') }}</v-btn>
-    <v-btn flat :to="{ name: 'receipts-list' }" exact>{{ $t('receipts_list') }}</v-btn>
+    <v-btn flat :to="{ name: 'receipts' }" exact>{{ $t('receipts_list') }}</v-btn>
     <v-btn flat :to="{ name: 'orders' }" exact>{{ $t('orders') }}</v-btn>
     <v-btn flat :to="{ name: 'service' }" exact>{{ $t('service') }}</v-btn>
   </v-toolbar-items>

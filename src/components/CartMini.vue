@@ -11,7 +11,7 @@
           <v-list-tile-sub-title>{{ item.name }}</v-list-tile-sub-title>
         </v-list-tile-content>
         <v-list-tile-avatar>
-          {{ item.quantity }} * {{ item.price | price_format }}
+          {{ item.quantity }} * {{ item.price_discount | price_format }}
         </v-list-tile-avatar>
       </v-list-tile>
       <v-divider v-if="index + 1 < items.length" :key="index"></v-divider>

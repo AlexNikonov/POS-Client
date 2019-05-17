@@ -19,14 +19,14 @@
         </v-flex>
         <v-flex lg9>
           <v-layout column>
-            <v-flex v-for="row in item.order_products" :key=row.line_id>
+            <v-flex v-for="row in item.order_products" :key="row.order_id + row.line_id">
               <v-layout row nowrap>
                 <v-flex lg1>{{ row.customer_code }}</v-flex>
                 <v-flex lg2 pl-1>{{ row.brand }}</v-flex>
                 <v-flex lg2 pl-1>{{ row.number }}</v-flex>
                 <v-flex lg3 pl-1 caption>{{ row.spec_name }}</v-flex>
                 <v-flex lg1 pl-1>{{ row.quantity }}</v-flex>
-                <v-flex lg1 pl-1>{{ row.price | price_format }}</v-flex>
+                <v-flex lg1 pl-1>{{ row.price_base | price_format }}</v-flex>
                 <v-flex lg1 pl-1>{{ row.discount | price_format }}</v-flex>
                 <v-flex lg1 pl-1>{{ row.price_discount | price_format }}</v-flex>
                 <v-flex lg2 pl-1>{{ row.status }}</v-flex>

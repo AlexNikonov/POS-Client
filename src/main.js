@@ -24,6 +24,11 @@ Vue.filter('price_format', function (value) {
   return value.toFixed(2)
 })
 
+Vue.filter('name_format', function (value) {
+  if (!value) return ''
+  return value.substring(0, 80) + ' ...'
+})
+
 new Vue({
   store,
   router,

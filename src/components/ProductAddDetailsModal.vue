@@ -19,7 +19,7 @@
                   <v-flex xs3>
                     <v-text-field
                       type=number
-                      :value="item.price"
+                      :value="item.price_discount"
                       @change="updatePrice($event)"
                       append-outer-icon="add"
                       @click:append-outer="incrementPrice()"

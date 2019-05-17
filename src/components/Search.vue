@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import api from '@/api/index'
 import ProductAddDetailsModal from './ProductAddDetailsModal.vue'
 
 export default {

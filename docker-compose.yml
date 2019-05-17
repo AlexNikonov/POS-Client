@@ -1,0 +1,17 @@
+# for local development
+# docker-compose up --build
+#
+# to add another node package: docker-compose exec frontend yarn add <package-name>
+
+version: '3.7'
+services:
+  dev:
+    build:
+      context: .
+      target: 'develop-stage'
+    ports:
+    - '8080:8080'
+    volumes:
+    - '.:/app'
+    - /app/node_modules/ # Just specify a path and let the Engine create a volume
+    command: /bin/sh -c 'npm run serve'
