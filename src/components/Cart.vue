@@ -1,7 +1,14 @@
 <template>
   <v-layout column align-space-between>
     <v-flex xs12>
-      <cart-item v-for="item in items" :key="item.id" :item="item" />
+      <product-item editable v-for="item in items" 
+        :key = "item.id"
+        :item = "item"
+        @update-quantity = "updateQuantity"
+        @update-price = "updatePrice"
+        @update-discount = "updateDiscount"
+        @remove-item = "removeItem"
+      />
     </v-flex>
     <v-flex>
       <v-layout item row nowrap py-2>
@@ -39,7 +46,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import { Printd } from 'printd'
-import CartItem from '@/components/CartItem.vue'
+import ProductItem from '@/components/ProductItem.vue'
 
 export default {
   name: 'cart',
@@ -52,9 +59,21 @@ export default {
     ...mapGetters('cart', ['items', 'total'])
   },
   components: {
-    CartItem
+    ProductItem
   },
   methods: {
+    updateQuantity (item, value) {
+      this.$store.dispatch('cart/updateQuantity', { item, value })
+    },
+    updatePrice (item, value) {
+      this.$store.dispatch('cart/updatePrice', { item, value })
+    },
+    updateDiscount (item, value) {
+      this.$store.dispatch('cart/updateDiscount', { item, value })
+    },
+    removeItem (item) {
+      this.$store.dispatch('cart/removeItem', item)  
+    },
     clear () {
       this.$store.dispatch('cart/clearCart')  
     },

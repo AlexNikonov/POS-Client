@@ -1,58 +1,42 @@
 <template>
-  <v-content>
-    <v-layout column v-if="items" justify-start>
-      <loading-indicator />
-      <v-flex xs12 py-2 v-for="item in items" :key=item.id>
-        <a :href="item.link">{{ item.brand}} - {{ item.number}} - {{ item.name }}</a>
-      </v-flex>
-    </v-layout>
-    <ul v-if="errors && errors.length">
-      <li v-for="error in errors" :key=error.id>
-        {{ error.message }}
-      </li>
-    </ul>
-  </v-content>
+  <v-layout column>
+    <v-flex xs12 v-if="items.lenght == 0">
+      {{ $t('not_found') }}
+    </v-flex>
+  
+    <v-flex xs12 py-2 v-for="item in items" :key=item.id>
+      <a :href="item.link">{{ item.short_name }}</a>
+    </v-flex>
+  </v-layout>
 </template>
 
 <script>
-import api from '@/api/index'
-import LoadingIndicator from '@/components/LoadingIndicator.vue'
+import Types from '@/types'
+import { getListBySubstring } from '@/api/ProductRepository'
 
 export default {
   name: 'search-result',
   props: ['substring'],
   data () {
     return {
-      brands: [],
-      items: [],
-      errors: [],
-      response: ''
+      items: []
     }
   },
   watch: {
-    '$route': 'fetchData'
-  },
-  methods: {
-    async fetchData() {
-      try {
-        this.errors = []
-        const response = await api.get(`products/search/${ this.substring }`)
-        this.response = response
-        this.items = response.data.list
-      } catch (e) {
-        this.errors.push(e)
+    $route: {
+      immediate: true,
+      async handler() {
+        try {
+          this.$emit(Types.events.LOADING, true)
+          this.items = await getListBySubstring(this.substring)
+          this.$emit(Types.events.LOADING, false)
+        } catch (error) {
+          this.$emit(Types.events.LOADING, false)
+          this.$emit(Types.events.ERROR, error)
+        }
       }
     }
-  },
-  mounted () {
-    this.fetchData()
-  },
-  components: {
-    LoadingIndicator
   }
 }
 </script>
 
-<style scoped>
-
-</style>

@@ -21,7 +21,6 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 
 export default {
   name: 'receipt-item',
@@ -29,15 +28,11 @@ export default {
     item: {
       type: Object
     }
-  },
-  computed: {
-
   }
 }
 </script>
 
 <style scoped>
-  .mmmm { margin-bottom: auto; }
 
 </style>
 

@@ -1,6 +1,6 @@
 'use strict'
 
-import { addReceipt } from '@/api/receipt'
+import { addReceipt } from '@/api/ReceiptRepository'
 import { get_uid, round_number, get_discount, get_price_discount } from '@/helpers'
 
 const state = {

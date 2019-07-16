@@ -1,5 +1,5 @@
 import api from './index'
-import Receipt from '@/models/receipt'
+import Receipt from '@/models/Receipt'
 
 export async function getListByDateRange (date_range) {
   try {

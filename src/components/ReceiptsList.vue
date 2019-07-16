@@ -1,6 +1,6 @@
 <script>
 import ReceiptItem from '@/components/ReceiptItem.vue'
-import { getListByDateRange } from '@/api/receipt'
+import { getListByDateRange } from '@/api/ReceiptRepository'
 
 export default {
   name: 'receipts-list',
@@ -28,7 +28,6 @@ export default {
   },
   render (h) {
     if (this.items.length) {
-      console.log(this.items)
       let r_list = []
       let days_list = this.items.reduce( (accumulator, currentValue) => {
         let current_date = this.$d(new Date(currentValue.created), 'short')

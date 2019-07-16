@@ -2,12 +2,15 @@ const messages = {
   ru: {
     search: 'Поиск',
     cart: 'Чек',
+    receipts: 'Чеки',
     receipts_list: 'Список чеков',
     service: 'Сервис',
     home: 'Главная',
     orders: 'Заказы',
     select: 'Выбрать',
     edit: 'Редактировать',
+    not_found: 'Не найдено',
+    item_added: 'Добавлено в корзину:',
     date_range: {
       label: 'Показать за период',
       items: [{
@@ -40,12 +43,15 @@ const messages = {
   en: {
     search: 'Search',
     cart: 'Cart',
+    receipts: 'Receipts',
     receipts_list: 'Receipts list',
     service: 'Service',
     home: 'Home',
     orders: 'Orders',
     select: 'Select',
     edit: 'edit',
+    not_found: 'Not Found',
+    item_added: 'Item added to cart:',
     date_range: {
       label: 'Show for a period',
       items: [{

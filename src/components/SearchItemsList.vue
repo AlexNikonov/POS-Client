@@ -7,72 +7,49 @@
       <v-flex lg2>{{ item.number }}</v-flex>
       <v-flex lg4>{{ item.name }}</v-flex>
       <v-flex lg1>{{ item.quantity }}</v-flex>
-      <v-flex lg1><a @click.prevent.stop="add_to_cart(item, item.price)">{{ item.price.toFixed(2) }}</a></v-flex>
-      <v-flex lg1><a @click.prevent.stop="add_to_cart(item, item.fixed_price)">{{ item.fixed_price.toFixed(2) }}</a></v-flex>
+      <v-flex lg1><a @click.prevent.stop="add_to_cart(item, item.price)">{{ item.price | price_format }}</a></v-flex>
+      <v-flex lg1><a @click.prevent.stop="add_to_cart(item, item.fixed_price)">{{ item.fixed_price | price_format }}</a></v-flex>
     </v-layout>
-
-    <ul v-if="errors && errors.length">
-      <li v-for="error in errors" :key=error.id>
-        {{ error.message }}
-      </li>
-    </ul>
-
-    <v-snackbar
-      v-model="snackbar"
-      :bottom="true"
-      :timeout="1000"
-    >
-      Товар {{ snackbar_item.number }} добавлен
-      <v-btn
-        color="pink"
-        flat
-        @click="snackbar = false"
-      >
-        Close
-      </v-btn>
-    </v-snackbar>
   </v-content>
 </template>
 
 <script>
-import api from '@/api/index'
+import Types from '@/types'
+import { getListByBrandAndNumber } from '@/api/ProductRepository'
 
 export default {
   name: 'search-items-list',
   props: ['brand_id', 'string'],
   data () {
     return {
-      snackbar: false,
-      snackbar_item: '',
-      search_string: '',  
-      items: [],
-      errors: [],
-      response: ''
+      items: []
     }
   },
   methods: {
     add_to_cart (item, selected_price) {
-      this.snackbar_item = item
-      this.snackbar = true
+      this.$toast(`$t('item_added') ${ snackbar_item.number }`)
       const item_to_add = {
         ...item,
         price_base: selected_price,
         price_discount: selected_price,
         quantity: 1
       }
-      this.$store.dispatch('cart/addItem', item_to_add)
+      this.$store.dispatch(Types.store.actions.CART_ADD_ITEM, item_to_add)
     }
   },
-  async mounted () {
-    try {
-      this.errors = []
-      const response = await api.get(
-        `products/search/exact/brand_id/${ this.brand_id }/string/${ this.string }`
-      )
-      this.response = response
-      this.items = response.data.list
-    } catch (e) {
-      this.errors.push(e)
+  watch: {
+    $route: {
+      immediate: true,
+      async handler() {
+        try {
+          this.$emit(Types.events.LOADING, true)
+          this.items = await getListByBrandAndNumber(this.brand_id, this.string)
+          this.$emit(Types.events.LOADING, false)
+        } catch (error) {
+          this.$emit(Types.events.LOADING, false)
+          this.$emit(Types.events.ERROR, error)
+        }
+      }
     }
   }
 }

@@ -1,8 +1,8 @@
 <template>
     <div class="input">
-      <button @click="decrement">&mdash;</button>
+      <button tabindex="-1" @click="decrement">&mdash;</button>
       <input type="number" min="0" :style="{ 'width': width }" @change="change" v-model="currentValue" />
-      <button @click="increment">&#xff0b;</button>
+      <button tabindex="-1" @click="increment">&#xff0b;</button>
     </div>
 </template>
 
@@ -27,6 +27,11 @@ export default {
   data () {
     return {
       currentValue: this.value
+    }
+  },
+  watch: {
+    value (new_value) {
+      this.currentValue = new_value
     }
   },
   methods: {

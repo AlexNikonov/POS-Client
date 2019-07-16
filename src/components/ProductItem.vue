@@ -4,17 +4,20 @@
     <div style="flex-basis: 10%">{{ item.number }}</div>
     <div style="flex-basis: 20%; min-width: 0; word-wrap: break-word;">{{ item.name | name_format}}</div>
     <div style="flex-basis: 15%">
-      <base-input-number :value="item.quantity" :width="'2rem'" @change="updateQuantity"/>
+      <base-input-number v-if="editable" :value="item.quantity" :width="'2rem'" @change="updateQuantity"/>
+      <span v-else>{{ item.quantity }}</span>
     </div>
     <div style="flex-basis: 5%">{{ item.price_base }}</div>
     <div style="flex-basis: 15%">
-      <base-input-number :value="item.discount" @change="updateDiscount"/>
+      <base-input-number v-if="editable" :value="item.discount" @change="updateDiscount"/>
+      <span v-else>{{ item.discount }}</span>
     </div>
     <div style="flex-basis: 15%">
-      <base-input-number :value="item.price_discount" :step="0.1" :width="'4rem'" @change="updatePrice"/>
+      <base-input-number v-if="editable" :value="item.price_discount" :step="0.1" :width="'4rem'" @change="updatePrice"/>
+      <span v-else>{{ item.price_discount }}</span>
     </div>
     <div style="flex-basis: 5%">{{ total }}</div>
-    <div style="flex-basis: 5%; display: flex;">
+    <div v-if="editable" style="flex-basis: 5%; display: flex;">
       <v-btn style="margin-left: auto;" icon class="hidden-xs-only" @click="removeItem(item)">
         <v-icon>remove_circle_outline</v-icon>
       </v-btn>
@@ -27,16 +30,15 @@ import { round_number } from '@/helpers'
 import BaseInputNumber from '@/components/BaseInputNumber.vue'
 
 export default {
-  name: 'cart-item',
+  name: 'product-item',
   props: {
+    editable: {
+      type: Boolean,
+      default: false
+    },
     item: {
       type: Object,
       required: true
-    }
-  },
-  data () {
-    return {
-
     }
   },
   components: {
@@ -49,17 +51,17 @@ export default {
   },
   methods: {
     updateQuantity (value) {
-      this.$store.dispatch('cart/updateQuantity', { item: this.item, value })
+      this.$emit('update-quantity', this.item, value)
     },
     updatePrice (value) {
-      this.$store.dispatch('cart/updatePrice', { item: this.item, value })
+      this.$emit('update-price', this.item, value)
     },
     updateDiscount (value) {
-      this.$store.dispatch('cart/updateDiscount', { item: this.item, value })
+      this.$emit('update-discount', this.item, value)
     },
     removeItem () {
-      this.$store.dispatch('cart/removeItem', this.item)  
-    },
+      this.$emit('remove-item', this.item)  
+    }
   }
 }
 </script>
@@ -73,4 +75,3 @@ export default {
     }
   }
 </style>
-
