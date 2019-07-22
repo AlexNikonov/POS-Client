@@ -1,11 +1,19 @@
 <template>
-  <v-layout column>
+  <v-layout column class="full_width">
     <v-flex xs12 v-if="items.lenght == 0">
       {{ $t('not_found') }}
     </v-flex>
   
     <v-flex xs12 py-2 v-for="item in items" :key=item.id>
-      <a :href="item.link">{{ item.short_name }}</a>
+      <a @click.prevent.stop="$emit(
+        'router_go_to',
+        {
+          name: 'search-items-list',
+          params: { brand_id: item.brand_id, string: item.search_string }
+        }
+      )">
+        {{ item.short_name }}
+      </a>
     </v-flex>
   </v-layout>
 </template>
@@ -25,6 +33,7 @@ export default {
   watch: {
     $route: {
       immediate: true,
+      deep: true,
       async handler() {
         try {
           this.$emit(Types.events.LOADING, true)
@@ -40,3 +49,8 @@ export default {
 }
 </script>
 
+<style scoped>
+  .full_width {
+    width: 100%;
+  }
+</style>

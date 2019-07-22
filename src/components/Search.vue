@@ -14,51 +14,41 @@
             @change="search_product_by_substring($event)"
           ></v-text-field>
     </v-flex>
-    <v-flex xs12 mt-3 v-if="error">
+    <v-flex xs12 mb-3 v-if="error">
       {{ error }}
     </v-flex>
-    <v-flex xs12 mt-5>
-        <loading-indicator :IsLoading="isLoading" />
+    <v-flex xs12 mb-5>
+      <loading-indicator :IsLoading="isLoading" />
     </v-flex>
-    <v-flex xs12 mt-5>
+    <v-flex xs12 mb-5 align-start>
       <transition name="fade" mode="out-in">
           <router-view
-            v-show="!isLoading"
-            v-on:[Types.events.ERROR]="errorHandler"
-            v-on:[Types.events.LOADING]="loadingHandler"
+            :key="$route.fullPath"
+            @error="errorHandler"
+            @loading="loadingHandler"
+            @router_go_to="routerGoTo"
           />
       </transition>
     </v-flex>
-    <product-add-details-modal ref="ProductAddDetailsModal" />
   </v-layout> 
 </template>
 
 <script>
-import Types from '@/types'
 import LoadingAndErrorMixin from '@/mixins/LoadingAndError'
-import ProductAddDetailsModal from './ProductAddDetailsModal.vue'
 
 export default {
   name: 'search',
-  data () {
-    return {
-      Types: Object.freeze(Types)
-    }
-  },
   mixins: [LoadingAndErrorMixin],
-  components: {
-    ProductAddDetailsModal
-  },
   methods: {
-    add_to_cart (item) {
-      this.$refs.ProductAddDetailsModal.open(item)
+    routerGoTo (routerLinkObject) {
+      this.$router.push(routerLinkObject)
     },
     search_product_by_substring (value) {
-      this.$router.push({
+      this.routerGoTo({
         name: 'search-by-substring',
         params: { substring: value }
       })
-    } 
+    }
   }
 }
 </script>

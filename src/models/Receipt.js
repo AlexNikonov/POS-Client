@@ -18,9 +18,9 @@ export default function(args) {
         search_string: item.search_string,
         name: item.name.substring(0, 50),
         quantity: item.quantity,
-        price_base: item.price,
+        price_base: Number(item.price),
         discount: item.discount,
-        price_discount: item.price_discount,
+        price_discount: Number(item.price_discount),
         product_id: item.product_id   
       })
       return total + item.price_discount * item.quantity

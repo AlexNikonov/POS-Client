@@ -1,20 +1,17 @@
 <template>
-  <v-content>
-    <v-layout item row wrap py-2 v-for="item in items"
-      :key="`${ item.customer_id }-${ item.search_string }`">
-      <v-flex lg1>{{ item.customer_code }}</v-flex>
-      <v-flex lg2>{{ item.brand }}</v-flex>
-      <v-flex lg2>{{ item.number }}</v-flex>
-      <v-flex lg4>{{ item.name }}</v-flex>
-      <v-flex lg1>{{ item.quantity }}</v-flex>
-      <v-flex lg1><a @click.prevent.stop="add_to_cart(item, item.price)">{{ item.price | price_format }}</a></v-flex>
-      <v-flex lg1><a @click.prevent.stop="add_to_cart(item, item.fixed_price)">{{ item.fixed_price | price_format }}</a></v-flex>
-    </v-layout>
-  </v-content>
+  <div>
+    <component
+      :is="currentView"
+      v-bind="currentViewProperties"
+      @edit-item="edit_item"
+      @add-item="add_to_cart"/>
+  </div>
 </template>
 
 <script>
 import Types from '@/types'
+import SearchItems from '@/components/SearchItems.vue'
+import ProductItemEditable from '@/components/ProductItemEditable.vue'
 import { getListByBrandAndNumber } from '@/api/ProductRepository'
 
 export default {
@@ -22,19 +19,42 @@ export default {
   props: ['brand_id', 'string'],
   data () {
     return {
-      items: []
+      items: [],
+      item: {},
+      currentView: SearchItems
+    }
+  },
+  components: {
+    SearchItems,
+    ProductItemEditable
+  },
+  computed: {
+    currentViewProperties () {
+      switch (this.currentView) {
+        case SearchItems:
+          return { items: this.items }
+        case ProductItemEditable:
+          return { item: this.item, showAddButton: true }
+      }
+      return SearchItems
     }
   },
   methods: {
-    add_to_cart (item, selected_price) {
-      this.$toast(`$t('item_added') ${ snackbar_item.number }`)
+    edit_item (item, selected_price) {
+      //this.$toast(`$t('item_added') ${ item.number }`)
       const item_to_add = {
         ...item,
         price_base: selected_price,
         price_discount: selected_price,
         quantity: 1
       }
-      this.$store.dispatch(Types.store.actions.CART_ADD_ITEM, item_to_add)
+      this.item = item_to_add
+      this.currentView = ProductItemEditable
+      //this.$refs.ProductAddDetailsModal.open(item_to_add)
+      //this.$store.dispatch(Types.store.actions.CART_ADD_ITEM, item_to_add)
+    },
+    add_to_cart () {
+      this.$store.dispatch(Types.store.actions.CART_ADD_ITEM, this.item)
     }
   },
   watch: {

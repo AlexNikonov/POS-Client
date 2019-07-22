@@ -4,12 +4,8 @@ import Order from '@/models/Order'
 const resource = '/orders'
 
 const get_resource = async url => {
-  try {
-    const response = await api.get(url)
-    return response.data.list.map(item => new Order(item))
-  } catch (err) {
-    throw new Error("Can't get orders! Error: " + err.message)
-  }
+  const response = await api.get(url)
+  return response.data.list.map(item => new Order(item))
 }
 
 export default {
@@ -22,8 +18,9 @@ export default {
   getListByPhoneNumber(value) {
     return get_resource(`${ resource }/phone_number/${ value }`)
   },
-  getOrder(id) {
-    return get_resource(`${ resource }/${ id }`)
+  async getOrder(id) {
+    const response = await api.get(`${ resource }/${ id }`)
+    return new Order(response.data.item)
   }
 }
 

@@ -12,10 +12,20 @@
         </v-flex>
       </v-layout>
     </v-flex>
+    <v-flex xs12 mb-3 v-if="error">
+      {{ error }}
+    </v-flex>
+    <v-flex xs12 mb-5>
+      <loading-indicator :IsLoading="isLoading" />
+    </v-flex>
     <v-flex xs12>
       <v-layout column>
         <v-flex>
-          <receipts-list :date_range="current_date_range" />
+          <receipts-list
+          :date_range="current_date_range"
+          @error="errorHandler"
+          @loading="loadingHandler"
+          />
         </v-flex>
       </v-layout>
     </v-flex>
@@ -23,6 +33,7 @@
 </template>
 
 <script>
+import LoadingAndErrorMixin from '@/mixins/LoadingAndError'
 import ReceiptsList from '@/components/ReceiptsList.vue'
 
 export default {
@@ -32,6 +43,7 @@ export default {
       current_date_range: 'today'
     }
   },
+  mixins: [LoadingAndErrorMixin],
   watch: {
     current_date_range: {
       immediate: true,

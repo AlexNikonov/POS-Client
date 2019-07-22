@@ -21,13 +21,18 @@ Vue.directive('focus', {
 })
 
 Vue.filter('price_format', function (value) {
-  if (!value) return 0
+	if (!value) return '0'
   return value.toFixed(2)
 })
 
 Vue.filter('name_format', function (value) {
   if (!value) return ''
   return value.substring(0, 80) + ' ...'
+})
+
+Vue.filter('short_name_format', function (value) {
+  if (!value) return ''
+  return value.substring(0, 40) + ' ...'
 })
 
 Vue.config.errorHandler = function (err, vm, info) {

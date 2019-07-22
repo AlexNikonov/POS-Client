@@ -3,7 +3,7 @@
     <v-flex lg10 px-2 py-2>
       <v-layout align-content-space-around column>
         <v-flex lg2>{{ order.id }}</v-flex>
-        <v-flex lg2>{{ order.updated_at | moment('LLL') }}</v-flex>
+        <v-flex lg2>{{ order.updated_at }}</v-flex>
         <v-flex lg2>{{ order.creator }}</v-flex>
         <v-flex>{{ order.status }}</v-flex>
         <v-flex>{{ order.client }}</v-flex>
@@ -14,36 +14,13 @@
     <v-flex lg12 px-2 py-2>
       <v-flex v-for="row in order.products" :key=row.line_id class="item-row">
         <v-layout row nowrap align-center>
-          <v-flex lg1>{{ row.customer_code }}</v-flex>
-          <v-flex lg1 pl-1 py-1>{{ row.brand }}</v-flex>
-          <v-flex lg2 pl-1 py-1>{{ row.number }}</v-flex>
-          <v-flex lg2 pl-1 py-1 caption>{{ row.spec_name }}</v-flex>
-          <v-flex lg2 px-4 py-1>
-            <base-input-number :value="row.quantity" :width="'2rem'" @change="updateQuantity"/>
-            <v-text-field
-              mask="##"
-              :value="row.quantity"
-              @input="updateQuantity(row, $event)"
-              append-outer-icon="add"
-              @click:append-outer="incrementQuantity(row)"
-              prepend-icon="remove"
-              @click:prepend="decrementQuantity(row)">
-            </v-text-field>
-          </v-flex>
-          <v-flex lg1 pl-1 py-1>{{ row.price_base | price_format }}</v-flex>
-          <v-flex lg1 pl-1 py-1>{{ row.discount | price_format }}</v-flex>
-          <v-flex lg1 pl-1 py-1>{{ row.price_discount | price_format }}</v-flex>
-          <v-flex lg1 py-1>
-            <v-btn icon class="hidden-xs-only" @click="add(row)">
-              <v-icon large>check_circle_outline</v-icon>
-            </v-btn>
-          </v-flex>
-          <v-flex lg1 pl-1 py-1>{{ row.status }}</v-flex>
-          <v-flex lg1 py-1>
-            <v-btn icon class="hidden-xs-only" @click="remove(row)">
-              <v-icon large>highlight_off</v-icon>
-            </v-btn>
-          </v-flex>
+          <product-item-editable editable v-for="item in items" 
+            :key = "item.id"
+            :item = "item"
+            @update-quantity = "updateQuantity"
+            @remove-item = "remove"
+            @add-item = "add"
+          />
         </v-layout>
       </v-flex>
     </v-flex>
@@ -51,9 +28,8 @@
 </template>
 
 <script>
-
 import OrderRepository from '@/api/OrderRepository'
-import { mapActions } from 'vuex'
+import ProductItemEditable from '@/components/ProductItemEditable.vue'
 
 export default {
   name: 'order',
@@ -67,17 +43,18 @@ export default {
       required: true
     }
   },
+  components: {
+    ProductItemEditable
+  },
   watch: {
     $route: {
-      handler: 'fetchData',
+      async handler () {
+        this.order = await OrderRepository.getOrder(this.id)
+      },
       immediate: true
     }
   },
   methods: {
-    ...mapActions('cart', ['addItem']),
-    async fetchData () {
-      this.order = await OrderRepository.getOrder(this.id)
-    },
     incrementQuantity (item) {
       item.quantity++
     },
@@ -89,7 +66,7 @@ export default {
       if (index > -1) this.order.items.splice(index, 1)
     },
     add (item) {
-      this.addItem(item)
+      this.$store.dispatch('cart/addItem', item)
     }
   }
 }

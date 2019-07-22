@@ -26,7 +26,7 @@
             <v-flex v-for="row in item.products" :key="row.order_id + '#' + row.line_id">
               <v-layout row nowrap>
                 <v-flex lg1>{{ row.customer_code }}</v-flex>
-                <v-flex lg9><product-item :item = row /></v-flex>
+                <v-flex lg9><product-item-editable :item = row /></v-flex>
                 <v-flex lg2 pl-1>{{ row.status }}</v-flex>
               </v-layout>
             </v-flex>
@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import ProductItem from '@/components/ProductItem.vue'
+import ProductItemEditable from '@/components/ProductItemEditable.vue'
 
 export default {
   name: 'order-item',
@@ -53,7 +53,7 @@ export default {
     }
   },
   components: {
-    ProductItem
+    ProductItemEditable
   }
 }
 </script>

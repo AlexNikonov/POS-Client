@@ -1,7 +1,7 @@
 <template>
   <v-layout column align-space-between>
     <v-flex xs12>
-      <product-item editable v-for="item in items" 
+      <product-item-editable showRemoveButton v-for="item in items" 
         :key = "item.id"
         :item = "item"
         @update-quantity = "updateQuantity"
@@ -22,22 +22,22 @@
       <v-btn @click="print">Печать</v-btn>
       <v-btn @click="save">Сохранить</v-btn>
     </v-flex>
-    <div id="print-layout" v-if="printLayoutVisibility">
+    <div id="print-layout" ref="print-layout" v-if="printLayoutVisibility">
       магазин "Автомаркет"
       <br>
       ООО "Авто-НАСА"
       <br>
       г. Минск, ул. Бельского, 71
       <br>
-      <h2 class="title"><b>К О П И Я&nbsp;&nbsp;&nbsp;Ч Е К А</b></h2>
-      <ul v-for="item in items" :key="item.id">
-        <li class="print-item">
-          <span class="print-item-name">{{ item.brand}} {{ item.number }} {{ item.name }}</span>
+      <p class="title"><b>К О П И Я&nbsp;&nbsp;&nbsp;Ч Е К А</b></p>
+      <div v-for="item in items" :key="item.id">
+        <div class="print-item">
+          <span class="print-item-name">{{ item.brand}} {{ item.number }} {{ item.name | short_name_format}}</span>
           <span class="print-item-price">{{ item.price_discount | price_format }}</span>
           <span class="print-item-quantity">{{ item.quantity }}</span>
-          <span class="print-item-total">{{ item.quantity * item.price_discount }}</span>
-        </li>
-      </ul>
+          <span class="print-item-total">{{ (item.quantity * item.price_discount) | price_format }}</span>
+        </div>
+      </div>
       <p class="total">ИТОГО:&nbsp;&nbsp;{{ total }}&nbsp;руб</p>
     </div>
   </v-layout>
@@ -46,7 +46,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import { Printd } from 'printd'
-import ProductItem from '@/components/ProductItem.vue'
+import ProductItemEditable from '@/components/ProductItemEditable.vue'
 
 export default {
   name: 'cart',
@@ -55,11 +55,11 @@ export default {
       printLayoutVisibility: false
     }
   },
-    computed: {
+  computed: {
     ...mapGetters('cart', ['items', 'total'])
   },
   components: {
-    ProductItem
+    ProductItemEditable
   },
   methods: {
     updateQuantity (item, value) {
@@ -77,37 +77,53 @@ export default {
     clear () {
       this.$store.dispatch('cart/clearCart')  
     },
-    async print () {
+    async print() {
+      this.printLayoutVisibility = true
+      await this.$nextTick()
+      let printElement = document.getElementById("#print-layout");
+      var printWindow = window.open('', 'PRINT');
+      printWindow.document.write(document.documentElement.innerHTML);
+      setTimeout(() => { // Needed for large documents
+        printWindow.document.body.style.margin = '0 0';
+        printWindow.document.body.innerHTML = printElement.outerHTML;
+        printWindow.document.close(); // necessary for IE >= 10
+        printWindow.focus(); // necessary for IE >= 10*/
+        printWindow.print();
+        printWindow.close();
+      }, 1000)
+      this.printLayoutVisibility = false
+    }, 
+    async printOld () {
       const d = new Printd()
       const cssText = `
+        span {
+          margin-right: 10px;
+        }
         .title {
           text-align: center;
-        }
-        ul {
-          display: flex;
-          flex-direction: column;
+          font-size: 10px;
         }
         .print-item {
-          display: flex;
           padding-bottom: 8px;
+          font-size: 7px;
           border-bottom: 1px dotted #767a82;
         }
         .print-item :last-child {
           border: 0;
         }
         .print-item-name {
-          flex-basis: 60%;
+
         }
         .print-item-quantity {
-          flex-basis: 10%;
+
           text-align: right;
         }
         .print-item-price {
-          flex-basis: 15%;
+
           text-align: right;
         }
         .print-item-total {
-          flex-basis: 15%;
+
           text-align: right;
         }
         .total {
@@ -116,7 +132,7 @@ export default {
           font-size: 24px;
         }
         #print-layout ul {
-          padding: 0;
+          margin-left: 60px;
         }
       }
       `
@@ -133,7 +149,15 @@ export default {
 </script>
 
 <style scoped lang="scss">
+
   #print-layout {
+    visibility: hidden;
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+
+  #pprint-layout {
     position: fixed;
     left: 0;
     top: 0;

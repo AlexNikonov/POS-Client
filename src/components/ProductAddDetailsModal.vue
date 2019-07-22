@@ -59,6 +59,7 @@
 
 <script>
 export default {
+  name: 'product-add-details-modal',
   data () {
     return {
       item: {},

@@ -1,5 +1,5 @@
 import api from './index'
-import Product from '@/models/Product'
+import PriceItem from '@/models/PriceItem'
 import ProductSearchItem from '@/models/ProductSearchItem';
 
 const resource = '/products/search'
@@ -11,5 +11,5 @@ export async function getListBySubstring(value) {
 
 export async function getListByBrandAndNumber(brand_id, string) {
   const response = await api.get(`${ resource }/exact/brand_id/${ brand_id }/string/${ string }`)
-  return response.data.list.map(item => new Product(item))
+  return response.data.list.map(item => new PriceItem(item))
 }
