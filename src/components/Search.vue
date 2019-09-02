@@ -1,26 +1,26 @@
 <template>
-  <v-layout column justify-center align-center>
-    <v-flex xs12>
-          <v-text-field
-            slot="extension"
-            append-icon="search"
-            class="lg-2 white--text"
-            solo-inverted
-            flat
-            hide-details
-            clearable
-            :disabled="isLoading"
-            :loading="isLoading"
-            @change="search_product_by_substring($event)"
-          ></v-text-field>
-    </v-flex>
-    <v-flex xs12 mb-3 v-if="error">
+  <div class="container">
+    <div class="centered">
+      <v-text-field
+        slot="extension"
+        append-icon="search"
+        class="lg-2 white--text"
+        solo-inverted
+        flat
+        hide-details
+        clearable
+        :disabled="isLoading"
+        :loading="isLoading"
+        @change="search_product_by_substring($event)"
+      />
+    </div>
+    <div class="centered" v-if="error">
       {{ error }}
-    </v-flex>
-    <v-flex xs12 mb-5>
+    </div>
+    <div class="centered">
       <loading-indicator :IsLoading="isLoading" />
-    </v-flex>
-    <v-flex xs12 mb-5 align-start>
+    </div>
+    <content>
       <transition name="fade" mode="out-in">
           <router-view
             :key="$route.fullPath"
@@ -29,8 +29,8 @@
             @router_go_to="routerGoTo"
           />
       </transition>
-    </v-flex>
-  </v-layout> 
+    </content>
+  </div> 
 </template>
 
 <script>
@@ -52,5 +52,19 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+  content {
+    text-align: left;
+  }
+  .container {
+    text-align: center;
+  }
+  .centered {
+    width: 50%;
+    margin: 0 auto;
+  }
+</style>
+
 
 

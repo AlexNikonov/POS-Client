@@ -7,21 +7,22 @@
         <v-flex lg2>{{ order.creator }}</v-flex>
         <v-flex>{{ order.status }}</v-flex>
         <v-flex>{{ order.client }}</v-flex>
-        <v-flex>({{ order.phone_code }}) {{ order.phone }} - {{ order.phone_operator_code }}</v-flex>
+        <v-flex>{{ phone }}</v-flex>
         <v-flex>{{ order.comment }}</v-flex>
       </v-layout>
     </v-flex>
     <v-flex lg12 px-2 py-2>
-      <v-flex v-for="row in order.products" :key=row.line_id class="item-row">
-        <v-layout row nowrap align-center>
-          <product-item-editable editable v-for="item in items" 
+      <v-flex v-for="item in order.products" :key=item.line_id class="item-row">
+          <product-item-editable 
             :key = "item.id"
-            :item = "item"
+            :data = "item"
+            showAddButton
+            showRemoveButton
             @update-quantity = "updateQuantity"
+            @update-discount = "updateDiscount"
             @remove-item = "remove"
             @add-item = "add"
           />
-        </v-layout>
       </v-flex>
     </v-flex>
   </v-layout>
@@ -32,7 +33,7 @@ import OrderRepository from '@/api/OrderRepository'
 import ProductItemEditable from '@/components/ProductItemEditable.vue'
 
 export default {
-  name: 'order',
+  name: 'order-edit',
   data () {
     return {
       order: {}
@@ -46,6 +47,11 @@ export default {
   components: {
     ProductItemEditable
   },
+  computed: {
+    phone () {
+      return this.order.phone ? `(${ this.order.phone_code }) ${ this.order.phone } - ${ this.order.phone_operator_code }` : ''
+    }
+  },
   watch: {
     $route: {
       async handler () {
@@ -55,18 +61,26 @@ export default {
     }
   },
   methods: {
-    incrementQuantity (item) {
-      item.quantity++
+    updateQuantity (item, value) {
+      const index = this.order.products.findIndex(a => a.line_id === item.line_id);
+      if (index > -1) {
+        item.quantity = value
+        this.$set(this.order.products, index, item)
+      }
     },
-    decrementQuantity (item) {
-      if (item.quantity > 1) item.quantity--
+    updateDiscount (item, value) {
+      const index = this.order.products.findIndex(a => a.line_id === item.line_id);
+      if (index > -1) {
+        item.discount = value
+        this.$set(this.order.products, index, item)
+      }
     },
     remove (item) {
-      const index = this.order.items.findIndex(o => o.line_id === item.line_id )
-      if (index > -1) this.order.items.splice(index, 1)
+      const index = this.order.products.findIndex(o => o.line_id === item.line_id )
+      if (index > -1) this.order.products.splice(index, 1)
     },
     add (item) {
-      this.$store.dispatch('cart/addItem', item)
+      this.$store.dispatch('cart/addItem', item) 
     }
   }
 }

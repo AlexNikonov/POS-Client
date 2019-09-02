@@ -1,9 +1,11 @@
 <template>
-  <fulfilling-square-spinner
-    v-if="IsLoading"
-    :size="50"
-    color="#ff1d5e"
-  />
+  <div class="loader-container">
+    <fulfilling-square-spinner
+      v-if="IsLoading"
+      :size="50"
+      color="#ff1d5e"
+    />
+  </div>
 </template>
 
 <script>
@@ -19,3 +21,10 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+  .loader-container {
+    padding: 2em;
+  }
+</style>
+

@@ -1,9 +1,42 @@
 <template>
+<div>
+  <div id="print-layout" ref="printed">
+      <div class="customer">магазин "Автомаркет"</div>
+      <p>ООО "Авто-НАСА"</p>
+      <p>УНП: 190988158</p>
+      <p>г. Минск, ул. Бельского,71</p>
+      <p>avto-market.by</p>
+      <p class="title">КОПИЯ ЧЕКА</p>
+      <div v-for="item in items" :key="item.id" class="print-item">
+        <div class="print-item-name">{{ item.brand}} {{ item.number }} {{ item.name | short_name_format}}</div>
+        <div class="print-item-price">{{ item.price_discount | price_format }}</div>
+        <div class="print-item-quantity">{{ item.quantity }}</div>
+        <div class="print-item-total">{{ (item.quantity * item.price_discount) | price_format }}</div>
+      </div>
+      <div class="total">
+        <span>ИТОГ</span>
+        <span>{{ total }}</span>
+      </div>
+      <div class="time">
+        <span>{{ Date.now() | moment('L') }}</span>
+        <span>{{ $d(Date.now(), 'time') }}</span>
+      </div>
+  </div>
   <v-layout column align-space-between>
     <v-flex xs12>
+      <v-layout align-center class="table-header">
+        <div style="flex: 0 1 10%">Производитель</div>
+        <div style="flex: 0 1 10%">Номер</div>
+        <div style="flex: 0 1 20%; padding-right: 1rem;">Наименование</div>
+        <div style="flex: 0 1 15%">Кол-во</div>
+        <div style="flex: 0 1 5%">Цена</div>
+        <div style="flex: 0 1 15%">Скидка</div>
+        <div style="flex: 0 1 15%">Цена со скидкой</div>
+        <div style="flex: 0 1 5%">Всего</div>
+      </v-layout>
       <product-item-editable showRemoveButton v-for="item in items" 
         :key = "item.id"
-        :item = "item"
+        :data = "item"
         @update-quantity = "updateQuantity"
         @update-price = "updatePrice"
         @update-discount = "updateDiscount"
@@ -22,39 +55,16 @@
       <v-btn @click="print">Печать</v-btn>
       <v-btn @click="save">Сохранить</v-btn>
     </v-flex>
-    <div id="print-layout" ref="print-layout" v-if="printLayoutVisibility">
-      магазин "Автомаркет"
-      <br>
-      ООО "Авто-НАСА"
-      <br>
-      г. Минск, ул. Бельского, 71
-      <br>
-      <p class="title"><b>К О П И Я&nbsp;&nbsp;&nbsp;Ч Е К А</b></p>
-      <div v-for="item in items" :key="item.id">
-        <div class="print-item">
-          <span class="print-item-name">{{ item.brand}} {{ item.number }} {{ item.name | short_name_format}}</span>
-          <span class="print-item-price">{{ item.price_discount | price_format }}</span>
-          <span class="print-item-quantity">{{ item.quantity }}</span>
-          <span class="print-item-total">{{ (item.quantity * item.price_discount) | price_format }}</span>
-        </div>
-      </div>
-      <p class="total">ИТОГО:&nbsp;&nbsp;{{ total }}&nbsp;руб</p>
-    </div>
   </v-layout>
+</div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import { Printd } from 'printd'
 import ProductItemEditable from '@/components/ProductItemEditable.vue'
 
 export default {
   name: 'cart',
-  data () {
-    return {
-      printLayoutVisibility: false
-    }
-  },
   computed: {
     ...mapGetters('cart', ['items', 'total'])
   },
@@ -78,68 +88,103 @@ export default {
       this.$store.dispatch('cart/clearCart')  
     },
     async print() {
-      this.printLayoutVisibility = true
-      await this.$nextTick()
-      let printElement = document.getElementById("#print-layout");
-      var printWindow = window.open('', 'PRINT');
-      printWindow.document.write(document.documentElement.innerHTML);
-      setTimeout(() => { // Needed for large documents
-        printWindow.document.body.style.margin = '0 0';
-        printWindow.document.body.innerHTML = printElement.outerHTML;
-        printWindow.document.close(); // necessary for IE >= 10
-        printWindow.focus(); // necessary for IE >= 10*/
-        printWindow.print();
-        printWindow.close();
-      }, 1000)
-      this.printLayoutVisibility = false
-    }, 
-    async printOld () {
-      const d = new Printd()
       const cssText = `
-        span {
-          margin-right: 10px;
+        body {
+          font-family: Lucida Console;
+          font-size: 14px;
+          margin: 0;
+        }
+        p {
+          font-size: 11px;
+          margin: 0 0 4px 0;
+        }
+        .customer {
+          font-size: 15px;
+          font-weight: bold;
+          text-align: center;
+          padding: 8px;
+          margin: 6px auto;
         }
         .title {
+          margin: 16px;
           text-align: center;
-          font-size: 10px;
+          font-size: 15px;
         }
         .print-item {
-          padding-bottom: 8px;
-          font-size: 7px;
-          border-bottom: 1px dotted #767a82;
-        }
-        .print-item :last-child {
-          border: 0;
+          margin: 0;
+          padding: 8px 0;
+          font-size: 10px;
+          border-bottom: 1px dotted black;
+          display: flex;
         }
         .print-item-name {
-
+          flex: 0 1 65%;
         }
         .print-item-quantity {
-
+          flex: 0 1 5%;
+          padding-left: 4px;
           text-align: right;
         }
         .print-item-price {
-
+          flex: 0 1 15%;
+          padding-left: 4px;
           text-align: right;
         }
         .print-item-total {
-
+          flex: 0 1 15%;
+          padding-left: 4px;
           text-align: right;
         }
         .total {
-          text-align: right;
+          display: flex;
+          justify-content: space-between;
           font-weight: bold;
-          font-size: 24px;
+          font-size: 14px;
+          margin: 8px 0;
+          padding-bottom: 4px;
+          border-bottom: 1px dotted black;
         }
-        #print-layout ul {
-          margin-left: 60px;
+        .time {
+          display: flex;
+          justify-content: space-between;
+          font-size: 12px;
+          font-style: italic;
+          margin: 8px 0;
+        }
+        @page {
+          margin-top: 0.5cm;
+          margin-bottom: 1cm;
+          margin-left: 1.5cm;
+          margin-right: 1.5cm;
         }
       }
       `
-      this.printLayoutVisibility = true
-      await this.$nextTick()
-      d.print(document.getElementById('print-layout'), cssText)
-      this.printLayoutVisibility = false
+      var iframe = window.document.createElement('iframe');
+      var css = 'visibility:hidden;width:0;height:0;position:absolute;z-index:-9999;bottom:0;';
+      iframe.setAttribute('src', 'about:blank');
+      iframe.setAttribute('style', css);
+      iframe.setAttribute('width', '0');
+      iframe.setAttribute('height', '0');
+      iframe.setAttribute('wmode', 'opaque');
+      window.document.body.appendChild(iframe);
+      
+      var copy = this.$refs.printed.cloneNode(true)
+      //var elStyle = window.getComputedStyle(this.$refs.printed).cssText
+      var cw = iframe.contentWindow
+      var doc = cw.document
+      doc.open()
+      doc.write('<!DOCTYPE html><html><head><meta charset="utf-8"></head><body></body></html>')
+      var style = doc.createElement('style');
+      style.type = 'text/css';
+      //style.appendChild(window.document.createTextNode(elStyle));
+      style.appendChild(window.document.createTextNode(cssText))
+      doc.addEventListener('load', () => {
+
+      }, false)
+      doc.head.appendChild(style)
+      doc.body.appendChild(copy)
+      doc.execCommand('print', false, null)
+      doc.close()
     },
     save () {
       this.$store.dispatch('cart/saveCart')
@@ -148,27 +193,15 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
-
+<style>
   #print-layout {
     visibility: hidden;
     position: absolute;
-    left: 0;
     top: 0;
+    left: 12px;
   }
 
-  #pprint-layout {
-    position: fixed;
-    left: 0;
-    top: 0;
-    z-index: 0;
-  }
-  #styled-input {
-    height: 40px;
-    font-size: 8pt;
-  }
-  .styled-input label[for] {
-    height: 40px;
-    font-size: 8pt;
+  .table-header {
+    font-weight: bold;
   }
 </style>

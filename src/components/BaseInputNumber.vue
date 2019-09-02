@@ -12,7 +12,6 @@ export default {
   name: 'BaseInputNumber',
   props: {
     value: {
-      type: Number,
       default: 0
     },
     step: {
@@ -30,8 +29,11 @@ export default {
     }
   },
   watch: {
-    value (new_value) {
-      this.currentValue = new_value
+    value : {
+      immediate: true,
+      handler(new_value) {
+        this.currentValue = Number(new_value)
+      }
     }
   },
   methods: {

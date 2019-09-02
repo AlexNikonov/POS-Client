@@ -9,7 +9,7 @@ export default class Product {
     this.brand = typeof brand === 'object' ? brand.name : brand
     this.number = number
     this.name = spec_name
-    this.quantity = quantity
+    this.quantity = quantity  
     this.price_base = price_base
     this.discount = discount
     this.price_discount = price_discount

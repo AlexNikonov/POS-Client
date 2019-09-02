@@ -1,11 +1,9 @@
 <template>
-  <div>
-    <component
-      :is="currentView"
-      v-bind="currentViewProperties"
-      @edit-item="edit_item"
-      @add-item="add_to_cart"/>
-  </div>
+  <component class="container"
+    :is="currentView"
+    v-bind="currentViewProperties"
+    @edit-item="edit_item"
+    @add-item="add_to_cart"/>
 </template>
 
 <script>
@@ -34,7 +32,7 @@ export default {
         case SearchItems:
           return { items: this.items }
         case ProductItemEditable:
-          return { item: this.item, showAddButton: true }
+          return { data: this.item, showAddButton: true }
       }
       return SearchItems
     }
@@ -76,7 +74,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.item {
-  border: 1px solid #ECEFF1
-}
+  .container {
+    width: 100%;
+    height: 100%;
+    text-align: left;
+  }
+  .item {
+    border: 1px solid #ECEFF1
+  }
 </style>
